@@ -5,7 +5,7 @@ class Parser:
     def __init__(self):
         # Define regex patterns based on BNF grammar
         self.state_pattern = r'[A-Za-z_][A-Za-z0-9_]*'
-        self.description_pattern = r':\s*[a-zA-Z0-9_\-:.,?!@=]+'
+        self.description_pattern = r':\s*[a-zA-Z0-9_\-:.,?!@=~]+'
         self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}(?:\s*{self.description_pattern})?'
         
     def is_valid_state(self, state):
