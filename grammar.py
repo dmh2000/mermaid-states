@@ -4,8 +4,9 @@ import re
 class Parser:
     def __init__(self):
         # Define regex patterns based on BNF grammar
-        self.state_pattern = r'[A-Za-z*][A-Za-z0-9_]*'
-        self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}'
+        self.state_pattern = r'[A-Za-z_][A-Za-z0-9_]*'
+        self.description_pattern = r':\s*[A-Za-z0-9]+'
+        self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}(?:\s*{self.description_pattern})?'
         
     def is_valid_state(self, state):
         """Check if a string matches the STATE rule"""
@@ -42,7 +43,9 @@ class Parser:
                     results.extend(self.parse_composite_state(nested_lines, indent + 1))
             elif self.is_valid_transition(line):
                 states = re.findall(self.state_pattern, line)
-                results.append("  " * indent + f"Valid transition from {states[0]} to {states[1]}")
+                description = re.findall(self.description_pattern, line)
+                desc_text = f" with description '{description[0][1:].strip()}'" if description else ""
+                results.append("  " * indent + f"Valid transition from {states[0]} to {states[1]}{desc_text}")
             else:
                 results.append("  " * indent + f"Invalid input: {line}")
             i += 1
