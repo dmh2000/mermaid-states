@@ -1,0 +1,3 @@
+TRANSITION:: STATE --> STATE
+COMPOSITE_STATE : "{" TRANSITION COMPOSITE_STATE "}"
+STATE:: [A-Z | a-z | "_" ] [A-Z | a-z | 0-9 | "_" ]*
