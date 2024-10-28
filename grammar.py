@@ -51,9 +51,18 @@ class Parser:
                     if brace_count > 0:
                         nested_lines.append(lines[i])
                     i += 1
-                if nested_lines:
-                    results.append("  " * indent + "Composite state contains:")
-                    results.extend(self.parse_composite_state(nested_lines, indent + 1))
+                if not nested_lines:
+                    results.append("  " * indent + "Error: Composite state must contain at least one transition")
+                else:
+                    # Parse nested lines and check if there's at least one valid transition
+                    nested_results = self.parse_composite_state(nested_lines, indent + 1)
+                    has_transition = any("Valid transition from" in result for result in nested_results)
+                    
+                    if not has_transition:
+                        results.append("  " * indent + "Error: Composite state must contain at least one transition")
+                    else:
+                        results.append("  " * indent + "Composite state contains:")
+                        results.extend(nested_results)
             elif self.is_valid_transition(line):
                 states = re.findall(self.state_pattern, line)
                 description = re.findall(self.description_pattern, line)
