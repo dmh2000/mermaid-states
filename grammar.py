@@ -26,10 +26,23 @@ class Parser:
                 i += 1
                 continue
                 
-            if line == "{":
+            if line.startswith("state "):
+                # Extract state name and verify it's valid
+                state_name = line.split()[1]
+                if not self.is_valid_state(state_name):
+                    results.append("  " * indent + f"Invalid state name: {state_name}")
+                    i += 1
+                    continue
+                    
+                # Skip the opening brace
+                i += 1
+                if i >= len(lines) or lines[i].strip() != "{":
+                    results.append("  " * indent + "Missing opening brace after state declaration")
+                    continue
+                results.append("  " * indent + f"Composite state {state_name}:")
                 nested_lines = []
                 brace_count = 1
-                i += 1
+                i += 1  # Move past the opening brace
                 while i < len(lines) and brace_count > 0:
                     if lines[i].strip() == "{":
                         brace_count += 1
