@@ -1,4 +1,4 @@
-import sys
+from sys import stdin, stderr
 import re
 
 class Parser:
@@ -18,7 +18,8 @@ class Parser:
     
     def parse_graph(self, lines, indent=0):
         """Parse a graph consisting of one or more transitions"""
-        results = []
+        valid_results = []
+        invalid_results = []
         i = 0
         while i < len(lines):
             line = lines[i].strip()
@@ -32,30 +33,36 @@ class Parser:
                 if match:
                     from_state, to_state, description = match.groups()
                     desc_text = f" with description '{description[1:].strip()}'" if description else ""
-                    results.append("  " * indent + f"Valid transition from {from_state} to {to_state}{desc_text}")
+                    valid_results.append("  " * indent + f"Valid transition from {from_state} to {to_state}{desc_text}")
             else:
-                results.append("  " * indent + f"Invalid input: {line}")
+                invalid_results.append("  " * indent + f"Invalid input: {line}")
             i += 1
-        return results
+        return valid_results, invalid_results
 
     def parse_input(self):
         """Parse all input as a graph of transitions"""
         lines = []
-        for line in sys.stdin:
+        for line in stdin:
             lines.append(line.rstrip())
         
         # Verify there is at least one transition
         valid_lines = [line for line in lines if line.strip() and self.is_valid_transition(line.strip())]
         if not valid_lines:
-            return ["Error: Graph must contain at least one transition"]
+            return [], ["Error: Graph must contain at least one transition"]
             
         return self.parse_graph(lines)
 
 def main():
     parser = Parser()
-    results = parser.parse_input()
-    for result in results:
+    valid_results, invalid_results = parser.parse_input()
+    
+    # Print valid results to stdout
+    for result in valid_results:
         print(result)
+        
+    # Print invalid results to stderr
+    for result in invalid_results:
+        print(result, file=stderr)
 
 if __name__ == "__main__":
     main()
