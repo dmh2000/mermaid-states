@@ -6,7 +6,7 @@ class Parser:
         # Define regex patterns based on BNF grammar
         self.state_pattern = r'[A-Za-z_][A-Za-z0-9_]*'
         self.description_pattern = r':[a-zA-Z0-9_\-:.,?!@=~ ]+'
-        self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}(?:\s*{self.description_pattern})?'
+        self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}(?:\s*{self.description_pattern})?$'
         
     def is_valid_state(self, state):
         """Check if a string matches the STATE rule"""
@@ -64,10 +64,12 @@ class Parser:
                         results.append("  " * indent + "Composite state contains:")
                         results.extend(nested_results)
             elif self.is_valid_transition(line):
-                states = re.findall(self.state_pattern, line)
-                description = re.findall(self.description_pattern, line)
-                desc_text = f" with description '{description[0][1:].strip()}'" if description else ""
-                results.append("  " * indent + f"Valid transition from {states[0]} to {states[1]}{desc_text}")
+                # Extract states and description
+                match = re.match(rf'^({self.state_pattern})\s*-->\s*({self.state_pattern})(?:\s*({self.description_pattern}))?$', line)
+                if match:
+                    from_state, to_state, description = match.groups()
+                    desc_text = f" with description '{description[1:].strip()}'" if description else ""
+                    results.append("  " * indent + f"Valid transition from {from_state} to {to_state}{desc_text}")
             else:
                 results.append("  " * indent + f"Invalid input: {line}")
             i += 1
