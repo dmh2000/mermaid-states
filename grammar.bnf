@@ -1,5 +1,4 @@
-TRANSITION:: STATE --> STATE
-COMPOSITE_STATE : "{" TRANSITION COMPOSITE_STATE "}"
-STATE:: [A-Z | a-z | "_" ] [A-Z | a-z | 0-9 | "_" ]*TRANSITION:: STATE --> STATE
-COMPOSITE_STATE : "{" TRANSITION COMPOSITE_STATE "}"
-STATE:: [A-Z | a-z | * ] [A-Z | a-z | 0-9 | _ ]*
+GRAPH: TRANSITION+
+TRANSITION:: STATE --> (STATE | STATE DESCRIPTION) "\n"
+STATE:: [A-Z|a-z|\_][A-Z|a-z|0-9\|_]*
+DESCRIPTION:: ":"[ a-zA-Z0-9\_\-\:\.\,\?\!\@\=\~]+
