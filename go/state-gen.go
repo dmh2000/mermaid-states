@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -59,13 +60,9 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 
 			if p.isValidState(fromState) && p.isValidState(toState) &&
 				p.isValidDescription(description) {
-				descText := ""
-				if description != "" {
-					descText = ": " + description
-				}
 				validResults = append(validResults,
-					fmt.Sprintf("%sValid transition from %s to %s%s",
-						strings.Repeat("  ", indent), fromState, toState, descText))
+					fmt.Sprintf("%s,%s,%s",
+						fromState, toState, description))
 			}
 		} else {
 			invalidResults = append(invalidResults,
@@ -118,6 +115,6 @@ func main() {
 
 	// Print invalid results to stderr
 	for _, result := range invalidResults {
-		fmt.Fprintln(os.Stderr, result)
+		log.Println(result)
 	}
 }
