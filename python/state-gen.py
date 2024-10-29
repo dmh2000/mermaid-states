@@ -2,14 +2,14 @@ from sys import stdin, stderr
 import re
 import logging
 
-PLACEHOLDER = "placeholder"
+PLACEHOLDER = "-"
 
 class Parser:
     def __init__(self):
         # Define regex patterns based on BNF grammar
         self.state_regex = re.compile(r'^(?:[A-Za-z_][A-Za-z0-9_]+|\[\*\])$')
-        self.transition_regex = re.compile(r'^([A-Za-z_][A-Za-z0-9_]+|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]+|\[\*\])(?:\s*:(.+))?$')
-        self.description_regex = re.compile(r'^[a-zA-Z0-9_\-:.,?!@=~ ]+$')
+        self.transition_regex = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$')
+        self.description_regex = re.compile(r'^.+$')
 
     def is_valid_state(self, state):
         """Check if a string matches the STATE rule"""
