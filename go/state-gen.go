@@ -17,8 +17,8 @@ type Parser struct {
 
 func NewParser() *Parser {
 	return &Parser{
-		stateRegex:       regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`),
-		transitionRegex:  regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)\s*-->\s*([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*(.+))?$`),
+		stateRegex:       regexp.MustCompile(`^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$`),
+		transitionRegex:  regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s+(.+))?$`),
 		descriptionRegex: regexp.MustCompile(`^[ a-zA-Z0-9_\-:.,?!@=~]+$`),
 	}
 }
