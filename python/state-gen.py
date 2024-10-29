@@ -1,60 +1,78 @@
 from sys import stdin, stderr
 import re
+import logging
+
+PLACEHOLDER = "placeholder"
 
 class Parser:
     def __init__(self):
         # Define regex patterns based on BNF grammar
-        self.state_pattern = r'[A-Za-z_][A-Za-z0-9_]*'
-        self.description_pattern = r':[a-zA-Z0-9_\-:.,?!@=~ ]+'
-        self.transition_pattern = rf'{self.state_pattern}\s*-->\s*{self.state_pattern}(?:\s*{self.description_pattern})?$'
-        
+        self.state_regex = re.compile(r'^(?:[A-Za-z_][A-Za-z0-9_]+|\[\*\])$')
+        self.transition_regex = re.compile(r'^([A-Za-z_][A-Za-z0-9_]+|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]+|\[\*\])(?:\s*:(.+))?$')
+        self.description_regex = re.compile(r'^[a-zA-Z0-9_\-:.,?!@=~ ]+$')
+
     def is_valid_state(self, state):
         """Check if a string matches the STATE rule"""
-        return bool(re.match(f'^{self.state_pattern}$', state))
+        return bool(self.state_regex.match(state))
     
     def is_valid_transition(self, line):
         """Check if a string matches the TRANSITION rule"""
-        return bool(re.match(f'^{self.transition_pattern}$', line))
+        return bool(self.transition_regex.match(line))
+
+    def is_valid_description(self, desc):
+        """Check if a string matches the DESCRIPTION rule"""
+        logging.debug(desc)
+        if not desc:
+            return True
+        return bool(self.description_regex.match(desc))
     
-    def parse_graph(self, lines, indent=0):
+    def parse_graph(self, lines):
         """Parse a graph consisting of one or more transitions"""
         valid_results = []
         invalid_results = []
-        i = 0
-        while i < len(lines):
-            line = lines[i].strip()
+
+        for line in lines:
+            line = line.strip()
             if not line:
-                i += 1
                 continue
                 
-            if self.is_valid_transition(line):
-                # Extract states and description
-                match = re.match(rf'^({self.state_pattern})\s*-->\s*({self.state_pattern})(?:\s*({self.description_pattern}))?$', line)
-                if match:
-                    from_state, to_state, description = match.groups()
-                    desc_text = f" with description '{description[1:].strip()}'" if description else ""
-                    valid_results.append("  " * indent + f"Valid transition from {from_state} to {to_state}{desc_text}")
+            matches = self.transition_regex.match(line)
+            if matches:
+                from_state = matches.group(1)
+                to_state = matches.group(2)
+                description = ""
+                if len(matches.groups()) > 2 and matches.group(3):
+                    description = matches.group(3).strip()
+
+                if self.is_valid_state(from_state) and self.is_valid_state(to_state) and self.is_valid_description(description):
+                    desc = description if description else PLACEHOLDER
+                    valid_results.append(f"{from_state},{to_state},{desc}")
             else:
-                invalid_results.append("  " * indent + f"Invalid input: {line}")
-            i += 1
+                invalid_results.append(f"Invalid input: {line}")
+
         return valid_results, invalid_results
 
-    def parse_input(self):
+    def parse_input(self, lines):
         """Parse all input as a graph of transitions"""
-        lines = []
-        for line in stdin:
-            lines.append(line.rstrip())
-        
         # Verify there is at least one transition
-        valid_lines = [line for line in lines if line.strip() and self.is_valid_transition(line.strip())]
-        if not valid_lines:
+        has_valid_transition = False
+        for line in lines:
+            if line.strip() and self.is_valid_transition(line.strip()):
+                has_valid_transition = True
+                break
+
+        if not has_valid_transition:
             return [], ["Error: Graph must contain at least one transition"]
             
         return self.parse_graph(lines)
 
 def main():
+    lines = []
+    for line in stdin:
+        lines.append(line.rstrip())
+
     parser = Parser()
-    valid_results, invalid_results = parser.parse_input()
+    valid_results, invalid_results = parser.parse_input(lines)
     
     # Print valid results to stdout
     for result in valid_results:
@@ -62,7 +80,8 @@ def main():
         
     # Print invalid results to stderr
     for result in invalid_results:
-        print(result, file=stderr)
+        logging.error(result)
 
 if __name__ == "__main__":
+    logging.basicConfig(format='%(message)s', level=logging.ERROR)
     main()
