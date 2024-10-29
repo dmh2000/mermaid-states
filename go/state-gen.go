@@ -60,9 +60,13 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 
 			if p.isValidState(fromState) && p.isValidState(toState) &&
 				p.isValidDescription(description) {
+				desc := description
+				if description == "" {
+					desc = "placeholder"
+				}
 				validResults = append(validResults,
 					fmt.Sprintf("%s,%s,%s",
-						fromState, toState, description))
+						fromState, toState, desc))
 			}
 		} else {
 			invalidResults = append(invalidResults,
