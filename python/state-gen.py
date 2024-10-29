@@ -1,6 +1,7 @@
-from sys import stdin, stderr
+import sys
 import re
 import logging
+import argparse
 
 PLACEHOLDER = "-"
 
@@ -67,9 +68,24 @@ class Parser:
         return self.parse_graph(lines)
 
 def main():
-    lines = []
-    for line in stdin:
-        lines.append(line.rstrip())
+    arg_parser = argparse.ArgumentParser(description='Parse state transition definitions')
+    arg_parser.add_argument('file', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
+                        help='Input file (if not specified, reads from stdin)')
+
+    args = arg_parser.parse_args()
+    
+    try:
+        lines = [line.rstrip() for line in args.file]
+    except Exception as e:
+        logging.error(f"Error reading input: {e}")
+        sys.exit(1)
+    finally:
+        if args.file is not sys.stdin:
+            args.file.close()
+
+    if not lines:
+        logging.error("No input provided")
+        sys.exit(1)
 
     parser = Parser()
     valid_results, invalid_results = parser.parse_input(lines)
