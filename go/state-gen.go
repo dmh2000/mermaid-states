@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+const placeholder = "-"
+
 type Parser struct {
 	stateRegex       *regexp.Regexp
 	transitionRegex  *regexp.Regexp
@@ -18,7 +20,7 @@ type Parser struct {
 func NewParser() *Parser {
 	return &Parser{
 		stateRegex:       regexp.MustCompile(`^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$`),
-		transitionRegex:  regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s+(.+))?$`),
+		transitionRegex:  regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$`),
 		descriptionRegex: regexp.MustCompile(`^[ a-zA-Z0-9_\-:.,?!@=~]+$`),
 	}
 }
@@ -32,6 +34,7 @@ func (p *Parser) isValidTransition(line string) bool {
 }
 
 func (p *Parser) isValidDescription(desc string) bool {
+	log.Println(desc)
 	if desc == "" {
 		return true
 	}
@@ -50,6 +53,9 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 		}
 
 		matches := p.transitionRegex.FindStringSubmatch(line)
+		for _, match := range matches {
+			log.Printf("%s,", match)
+		}
 		if matches != nil {
 			fromState := matches[1]
 			toState := matches[2]
@@ -62,7 +68,7 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 				p.isValidDescription(description) {
 				desc := description
 				if description == "" {
-					desc = "placeholder"
+					desc = placeholder
 				}
 				validResults = append(validResults,
 					fmt.Sprintf("%s,%s,%s",

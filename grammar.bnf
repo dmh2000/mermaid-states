@@ -1,4 +1,7 @@
 GRAPH: TRANSITION+
-TRANSITION:: STATE --> (STATE | STATE DESCRIPTION) "\n"
-STATE:: [A-Z|a-z|\_][A-Z|a-z|0-9\|_]*
-DESCRIPTION:: ":"[ a-zA-Z0-9\_\-\:\.\,\?\!\@\=\~]+
+TRANSITION:: STATE --> [STATE | STATE DESCRIPTION] "\n"
+STATE:: NAME | NAME DESCRIPTION
+NAME:: [A-Z|a-z|\_][A-Z|a-z|0-9\|_]+
+DESCRIPTION:: :DESC_TEXT
+DESC_TEXT:: [a-zA-Z0-9\p]+
+
