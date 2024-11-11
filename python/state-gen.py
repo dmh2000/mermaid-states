@@ -8,7 +8,7 @@ PLACEHOLDER = "-"
 class Parser:
     def __init__(self):
         # Define regex patterns based on BNF grammar
-        self.state_regex = re.compile(r'^(?:[A-Za-z_][A-Za-z0-9_]+|\[\*\])$')
+        self.state_regex = re.compile(r'^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$')
         self.transition_regex = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$')
         self.description_regex = re.compile(r'^.+$')
 
@@ -48,6 +48,8 @@ class Parser:
                 if self.is_valid_state(from_state) and self.is_valid_state(to_state) and self.is_valid_description(description):
                     desc = description if description else PLACEHOLDER
                     valid_results.append(f"{from_state},{to_state},{desc}")
+                else:
+                    invalid_results.append(f"Invalid input: {line}")
             else:
                 invalid_results.append(f"Invalid input: {line}")
 

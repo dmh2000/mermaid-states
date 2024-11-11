@@ -37,7 +37,6 @@ func (p *Parser) isValidTransition(line string) bool {
 }
 
 func (p *Parser) isValidDescription(desc string) bool {
-	log.Println(desc)
 	if desc == "" {
 		return true
 	}
@@ -56,9 +55,6 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 		}
 
 		matches := p.transitionRegex.FindStringSubmatch(line)
-		for _, match := range matches {
-			log.Printf("%s,", match)
-		}
 		if matches != nil {
 			fromState := matches[1]
 			toState := matches[2]
