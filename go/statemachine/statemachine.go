@@ -97,12 +97,12 @@ func (sm *StateMachine[Model, Input]) SetInitialState(state *State[Model, Input]
 		return fmt.Errorf("state is nil")
 	}
 
-	state, exists := sm.states[state.key]
+	next, exists := sm.states[state.key]
 	if !exists {
 		return fmt.Errorf("state %d does not exist", state.key)
 	}
 
-	sm.currentState = state
+	sm.currentState = next
 
 	return nil
 }
