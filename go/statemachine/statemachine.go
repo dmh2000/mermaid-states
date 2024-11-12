@@ -12,10 +12,14 @@ Input type : the input data that is passed to the state
 
 type StateKey int32
 
+func (k StateKey) String() string {
+	return fmt.Sprintf("%d", k)
+}
+
 type State[Model any, Input any] struct {
 	key    StateKey
 	name   string
-	action func(*Model, Input) (key int32, err error)
+	action func(*Model, Input) (key StateKey, err error)
 }
 
 func (s *State[Model, Input]) String() string {
@@ -31,14 +35,14 @@ func (s *State[Model, Input]) GetName() string {
 }
 
 // Execute :  the state action and return a key to the next state (could be the same or different)
-func (s *State[Model, Input]) Execute(model *Model, input Input) (key int32, err error) {
+func (s *State[Model, Input]) Execute(model *Model, input Input) (key StateKey, err error) {
 	return s.action(model, input)
 }
 
 func NewState[Model any, Input any](
 	key StateKey,
 	name string,
-	act func(*Model, Input) (key int32, err error),
+	act func(*Model, Input) (key StateKey, err error),
 ) *State[Model, Input] {
 	return &State[Model, Input]{
 		key:    key,
@@ -67,6 +71,10 @@ func (sm *StateMachine[Model, Input]) String() string {
 	return fmt.Sprintf("name: %s , states: %d", sm.name, len(sm.states))
 }
 
+func (sm *StateMachine[Model, Input]) GetCurrentState() *State[Model, Input] {
+	return sm.currentState
+}
+
 func (sm *StateMachine[Model, Input]) AddState(state *State[Model, Input]) error {
 	// check if state already exists
 	if _, exists := sm.states[state.key]; exists {
@@ -85,64 +93,16 @@ func (sm *StateMachine[Model, Input]) AddState(state *State[Model, Input]) error
 }
 
 func (sm *StateMachine[Model, Input]) SetInitialState(state *State[Model, Input]) error {
+	if state == nil {
+		return fmt.Errorf("state is nil")
+	}
+
 	state, exists := sm.states[state.key]
 	if !exists {
 		return fmt.Errorf("state %d does not exist", state.key)
 	}
+
 	sm.currentState = state
+
 	return nil
 }
-
-// ============================================================================
-
-// func AddState[data Data](sm *StateMachine[data], state *State[data]) error {
-
-// 	// check if state already exists
-// 	if _, exists := sm.states[state.Key]; exists {
-// 		return fmt.Errorf("state %d already exists", state.Key)
-// 	}
-// 	// add it to the map
-// 	sm.states[state.Key] = state
-
-// 	// if its the first state, set it as the initial state
-// 	if sm.current_state == nil {
-// 		if err := SetInitialState(sm, state.Key); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	// no errors
-// 	return nil
-// }
-
-// func SetInitialState[data Data](sm *StateMachine[data], key int32) error {
-// 	state, exists := sm.states[key]
-// 	if !exists {
-// 		return fmt.Errorf("state %d does not exist", key)
-// 	}
-// 	sm.current_state = state
-// 	return nil
-// }
-
-// func executeState[data Data](sm *StateMachine[data], input Input) error {
-// 	if sm.current_state == nil {
-// 		return fmt.Errorf("no current state set")
-// 	}
-
-// 	state, exists := sm.states[sm.current_state.Key]
-// 	if !exists {
-// 		return fmt.Errorf("no current state set")
-// 	}
-
-// 	next_state, err := state.Action(state, input)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	sm.current_state = next_state
-// 	return nil
-// }
-
-// func Run[data Data](sm *StateMachine[data], input Input) error {
-// 	return executeState(sm, input)
-// }

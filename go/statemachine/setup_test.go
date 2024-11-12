@@ -39,10 +39,10 @@ func TestAddState(t *testing.T) {
 	}
 
 	// add a state
-	state := NewState[testModel, int](
+	state := NewState(
 		STATE1,
 		"state1",
-		func(model *testModel, input int) (key int32, err error) {
+		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
 			return 2, nil
 		},
@@ -74,10 +74,10 @@ func TestSetInitialState(t *testing.T) {
 	}
 
 	// add a state1
-	state1 := NewState[testModel, int](
+	state1 := NewState(
 		STATE1,
 		"state1",
-		func(model *testModel, input int) (key int32, err error) {
+		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
 			return 2, nil
 		},
@@ -91,16 +91,16 @@ func TestSetInitialState(t *testing.T) {
 		t.Errorf("unexpected state machine string: %s", sm.String())
 	}
 
-	s := sm.currentState.String()
+	s := sm.GetCurrentState().String()
 	if s != "key: 1 , name: state1" {
 		t.Errorf("unexpected state string: %s", s)
 	}
 
 	// add a state
-	state2 := NewState[testModel, int](
+	state2 := NewState(
 		STATE2,
 		"state2",
-		func(model *testModel, input int) (key int32, err error) {
+		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
 			return 2, nil
 		},
@@ -118,7 +118,7 @@ func TestSetInitialState(t *testing.T) {
 		t.Errorf("unexpected error: %s", err)
 	}
 
-	s = sm.currentState.String()
+	s = sm.GetCurrentState().String()
 	if s != "key: 2 , name: state2" {
 		t.Errorf("unexpected state string: %s", s)
 	}
