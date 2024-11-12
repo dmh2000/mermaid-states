@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-/**
-Model type : a pointer to the common data that is shared between states
-Input type : the input data that is passed to the state
-*/
-
 type StateKey int32
 
 func (k StateKey) String() string {
@@ -80,29 +75,49 @@ func (sm *StateMachine[Model, Input]) AddState(state *State[Model, Input]) error
 	if _, exists := sm.states[state.key]; exists {
 		return fmt.Errorf("state %d already exists", state.key)
 	}
-	// add it to the map
+	// ok, add it to the map
 	sm.states[state.key] = state
 
 	// if there is no current state, set it as the initial state
 	if sm.currentState == nil {
-		if err := sm.SetInitialState(state); err != nil {
+		if err := sm.SetInitialState(state.key); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (sm *StateMachine[Model, Input]) SetInitialState(state *State[Model, Input]) error {
-	if state == nil {
-		return fmt.Errorf("state is nil")
-	}
+func (sm *StateMachine[Model, Input]) SetInitialState(key StateKey) error {
 
-	next, exists := sm.states[state.key]
+	state, exists := sm.states[key]
 	if !exists {
-		return fmt.Errorf("state %d does not exist", state.key)
+		return fmt.Errorf("state %d does not exist", key)
 	}
 
-	sm.currentState = next
+	sm.currentState = state
 
 	return nil
+}
+
+func (sm *StateMachine[Model, Input]) Execute(model *Model, input Input) (key StateKey, err error) {
+	key, err = sm.currentState.Execute(model, input)
+	if err != nil {
+		return
+	}
+
+	// same state, no change
+	if key == sm.currentState.GetKey() {
+		return key, nil
+	}
+
+	// new state
+	newState, exists := sm.states[key]
+	if !exists {
+		return 0, fmt.Errorf("state %d does not exist", key)
+	}
+
+	// set next state
+	sm.currentState = newState
+
+	return newState.GetKey(), nil
 }

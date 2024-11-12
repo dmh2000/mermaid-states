@@ -114,7 +114,7 @@ func TestSetInitialState(t *testing.T) {
 		t.Errorf("unexpected state machine string: %s", sm.String())
 	}
 
-	if err := sm.SetInitialState(state2); err != nil {
+	if err := sm.SetInitialState(state2.GetKey()); err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
 
