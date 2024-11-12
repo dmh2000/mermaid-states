@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // State represents a state in the state machine
 type State struct {
 	Name        string
@@ -8,10 +10,10 @@ type State struct {
 
 // Transition represents a transition between states
 type Transition struct {
-	From      string
-	To        string
-	Event     string
-	Action    func() error
+	From   string
+	To     string
+	Event  string
+	Action func() error
 }
 
 // StateMachine represents the finite state machine
@@ -77,7 +79,7 @@ func (sm *StateMachine) Trigger(event string) error {
 
 	transition, exists := sm.currentState.Transitions[event]
 	if !exists {
-		return fmt.Errorf("no transition for event '%s' from state '%s'", 
+		return fmt.Errorf("no transition for event '%s' from state '%s'",
 			event, sm.currentState.Name)
 	}
 
