@@ -19,7 +19,7 @@ type State[Model any, Input any] struct {
 }
 
 func (s *State[Model, Input]) String() string {
-	return fmt.Sprintf("State %d: %s", s.key, s.name)
+	return fmt.Sprintf("key: %d , name: %s", s.key, s.name)
 }
 
 func (s *State[Model, Input]) GetKey() StateKey {
@@ -50,7 +50,7 @@ func NewState[Model any, Input any](
 // ============================================================================
 
 type StateMachine[Model any, Input any] struct {
-	currentState *State[*Model, Input]
+	currentState *State[Model, Input]
 	states       map[StateKey]*State[Model, Input]
 	name         string
 }
@@ -64,7 +64,7 @@ func NewStateMachine[Model any, Input any](model *Model, name string) *StateMach
 }
 
 func (sm *StateMachine[Model, Input]) String() string {
-	return fmt.Sprintf("StateMachine %s , %d", sm.name, len(sm.states))
+	return fmt.Sprintf("name: %s , states: %d", sm.name, len(sm.states))
 }
 
 func (sm *StateMachine[Model, Input]) AddState(state *State[Model, Input]) error {
@@ -74,6 +74,22 @@ func (sm *StateMachine[Model, Input]) AddState(state *State[Model, Input]) error
 	}
 	// add it to the map
 	sm.states[state.key] = state
+
+	// if there is no current state, set it as the initial state
+	if sm.currentState == nil {
+		if err := sm.SetInitialState(state); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (sm *StateMachine[Model, Input]) SetInitialState(state *State[Model, Input]) error {
+	state, exists := sm.states[state.key]
+	if !exists {
+		return fmt.Errorf("state %d does not exist", state.key)
+	}
+	sm.currentState = state
 	return nil
 }
 
