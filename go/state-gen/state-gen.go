@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
@@ -101,6 +103,15 @@ func (p *Parser) parseInput(lines []string) ([]string, []string) {
 }
 
 func main() {
+	// Define command line flags
+	verbose := flag.Bool("v", false, "Enable verbose logging output")
+	flag.Parse()
+
+	// Configure logging based on verbose flag
+	if !*verbose {
+		log.SetOutput(io.Discard)
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
 
@@ -124,6 +135,8 @@ func main() {
 
 	// Print invalid results to stderr
 	for _, result := range invalidResults {
-		log.Println(result)
+		if *verbose {
+			log.Println(result)
+		}
 	}
 }

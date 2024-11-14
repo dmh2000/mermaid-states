@@ -20,4 +20,3 @@ echo "State1j --> [*] :description text" | python state-gen.py
 echo "A --> B: :.,?!@=~" | python state-gen.py
 echo "A --> B::.,?!@=~" | python state-gen.py
 echo "A --> B: : .,?!@=~" | python state-gen.py
-
