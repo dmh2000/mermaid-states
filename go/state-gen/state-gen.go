@@ -102,17 +102,7 @@ func (p *Parser) parseInput(lines []string) ([]string, []string) {
 	return p.parseGraph(lines)
 }
 
-func main() {
-	// Define command line flags
-	verbose := flag.Bool("v", false, "Enable verbose logging output")
-	flag.Parse()
-
-	// Configure logging based on verbose flag
-	if !*verbose {
-		log.SetOutput(io.Discard)
-	}
-
-	scanner := bufio.NewScanner(os.Stdin)
+func processInput(scanner *bufio.Scanner) ([]string, []string) {
 	var lines []string
 
 	// Read all input lines
@@ -126,7 +116,21 @@ func main() {
 	}
 
 	parser := NewParser()
-	validResults, invalidResults := parser.parseInput(lines)
+	return parser.parseInput(lines)
+}
+
+func main() {
+	// Define command line flags
+	verbose := flag.Bool("v", false, "Enable verbose logging output")
+	flag.Parse()
+
+	// Configure logging based on verbose flag
+	if !*verbose {
+		log.SetOutput(io.Discard)
+	}
+
+	scanner := bufio.NewScanner(os.Stdin)
+	validResults, invalidResults := processInput(scanner)
 
 	// Print valid results to stdout
 	for _, result := range validResults {
