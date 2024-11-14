@@ -30,6 +30,7 @@ void test_add_state() {
         "state1",
         [](TestModel& m, const int& input) {
             m.value = input;
+            std::cout << "State 1 (key=" << STATE1 << ", name=state1): model.value = " << m.value << "\n";
             return STATE2;
         }
     );
@@ -59,6 +60,7 @@ void test_state_machine_execution() {
         "state2",
         [](TestModel& m, const int& input) {
             m.value = input;
+            std::cout << "State 2 (key=" << STATE2 << ", name=state2): model.value = " << m.value << "\n";
             return STATE3;
         }
     ));
@@ -68,6 +70,7 @@ void test_state_machine_execution() {
         "state3",
         [](TestModel& m, const int& input) {
             m.value = input;
+            std::cout << "State 3 (key=" << STATE3 << ", name=state3): model.value = " << m.value << "\n";
             return STATE4;
         }
     ));
@@ -77,6 +80,7 @@ void test_state_machine_execution() {
         "state4",
         [](TestModel& m, const int& input) {
             m.value = input;
+            std::cout << "State 4 (key=" << STATE4 << ", name=state4): model.value = " << m.value << "\n";
             return STATE4;
         }
     ));
