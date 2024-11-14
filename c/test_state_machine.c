@@ -17,24 +17,28 @@ typedef struct {
 static state_key_t state1_action(void* model, void* input) {
     test_model_t* m = (test_model_t*)model;
     m->value = *(int*)input;
+    printf("State 1 (key=%d): model.value = %d\n", STATE1, m->value);
     return STATE2;
 }
 
 static state_key_t state2_action(void* model, void* input) {
     test_model_t* m = (test_model_t*)model;
     m->value = *(int*)input;
+    printf("State 2 (key=%d): model.value = %d\n", STATE2, m->value);
     return STATE3;
 }
 
 static state_key_t state3_action(void* model, void* input) {
     test_model_t* m = (test_model_t*)model;
     m->value = *(int*)input;
+    printf("State 3 (key=%d): model.value = %d\n", STATE3, m->value);
     return STATE4;
 }
 
 static state_key_t state4_action(void* model, void* input) {
     test_model_t* m = (test_model_t*)model;
     m->value = *(int*)input;
+    printf("State 4 (key=%d): model.value = %d\n", STATE4, m->value);
     return STATE4;
 }
 
