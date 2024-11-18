@@ -1,8 +1,8 @@
-package main
+// Package stategen ...
+package stategen
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -119,28 +119,31 @@ func processInput(scanner *bufio.Scanner) ([]string, []string) {
 	return parser.parseInput(lines)
 }
 
-func main() {
-	// Define command line flags
-	verbose := flag.Bool("v", false, "Enable verbose logging output")
-	flag.Parse()
-
+// ProcessStateFile processes a state definition file and returns the valid results
+// and an error if there are any invalid results. If verbose is true, invalid results
+// are logged to stderr.
+func ProcessStateFile(file *os.File, verbose bool) ([]string, error) {
 	// Configure logging based on verbose flag
-	if !*verbose {
+	if !verbose {
 		log.SetOutput(io.Discard)
+	} else {
+		log.SetOutput(os.Stderr)
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(file)
 	validResults, invalidResults := processInput(scanner)
 
-	// Print valid results to stdout
-	for _, result := range validResults {
-		fmt.Println(result)
+	// If there are invalid results, create an error with the details
+	var err error
+	if len(invalidResults) > 0 {
+		// Log invalid results if verbose
+		for _, result := range invalidResults {
+			if verbose {
+				log.Println(result)
+			}
+		}
+		err = fmt.Errorf("found %d invalid state definitions", len(invalidResults))
 	}
 
-	// Print invalid results to stderr
-	for _, result := range invalidResults {
-		if *verbose {
-			log.Println(result)
-		}
-	}
+	return validResults, err
 }

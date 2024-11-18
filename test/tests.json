@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "name": "basic transition",
+      "input": ["State1 --> State2"],
+      "wantValid": ["State1,State2,-"],
+      "wantInvalid": null
+    },
+    {
+      "name": "transition with description",
+      "input": ["State1 --> State2 : description"],
+      "wantValid": ["State1,State2, description"],
+      "wantInvalid": null
+    },
+    {
+      "name": "start state transition",
+      "input": ["[*] --> State1"],
+      "wantValid": ["[*],State1,-"],
+      "wantInvalid": null
+    },
+    {
+      "name": "end state transition",
+      "input": ["State1 --> [*]"],
+      "wantValid": ["State1,[*],-"],
+      "wantInvalid": null
+    },
+    {
+      "name": "invalid state name",
+      "input": ["1State --> State2"],
+      "wantValid": null,
+      "wantInvalid": ["Invalid input: 1State --> State2"]
+    },
+    {
+      "name": "empty line",
+      "input": [""],
+      "wantValid": null,
+      "wantInvalid": null
+    }
+  ]
+}
