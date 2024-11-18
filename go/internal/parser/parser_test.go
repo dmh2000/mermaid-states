@@ -23,7 +23,7 @@ type TestSuite struct {
 
 func loadTestCases(t *testing.T) []TestCase {
 	// Get the absolute path to the test file
-	absPath, err := filepath.Abs("../../test/tests.json")
+	absPath, err := filepath.Abs("../../../test/tests.json")
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)
 	}
@@ -62,7 +62,7 @@ func TestParser_ParseGraph(t *testing.T) {
 
 func TestWithInputFile(t *testing.T) {
 	// Read input file
-	inputFile, err := os.Open("../../test/input.txt")
+	inputFile, err := os.Open("../../../test/input.txt")
 	if err != nil {
 		t.Fatalf("Failed to open input file: %v", err)
 	}

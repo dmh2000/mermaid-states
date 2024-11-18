@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	stategen "sqirvy.xyz/state-gen/state-gen"
+	stategen "sqirvy.xyz/state-gen/internal/parser"
 )
 
 func main() {
