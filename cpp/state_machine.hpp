@@ -23,9 +23,9 @@ public:
         }
     }
 
-    StateKey getKey() const { return key_; }
-    std::string getName() const { return name_; }
-    std::string toString() const;
+    [[nodiscard]] StateKey getKey() const noexcept { return key_; }
+    [[nodiscard]] std::string getName() const noexcept { return name_; }
+    [[nodiscard]] std::string toString() const noexcept;
     
     StateKey execute(Model& model, const Input& input) {
         return action_(model, input);
@@ -43,11 +43,12 @@ public:
     StateMachine(Model& model, const std::string& name)
         : model_(model), name_(name), currentState_(nullptr) {}
 
-    std::string toString() const;
+    [[nodiscard]] std::string toString() const noexcept;
     
-    State<Model, Input>* getCurrentState() { return currentState_; }
+    [[nodiscard]] const State<Model, Input>* getCurrentState() const noexcept { return currentState_; }
+    [[nodiscard]] State<Model, Input>* getCurrentState() noexcept { return currentState_; }
     
-    std::map<StateKey, std::unique_ptr<State<Model, Input>>> getStates() const;
+    [[nodiscard]] const std::map<StateKey, std::unique_ptr<State<Model, Input>>>& getStates() const noexcept { return states_; }
     
     void addState(std::unique_ptr<State<Model, Input>> state);
     

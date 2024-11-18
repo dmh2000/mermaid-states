@@ -4,12 +4,12 @@
 namespace sm {
 
 template<typename Model, typename Input>
-std::string State<Model, Input>::toString() const {
+std::string State<Model, Input>::toString() const noexcept {
     return "key: " + std::to_string(key_) + " , name: " + name_;
 }
 
 template<typename Model, typename Input>
-std::string StateMachine<Model, Input>::toString() const {
+std::string StateMachine<Model, Input>::toString() const noexcept {
     return "name: " + name_ + " , states: " + std::to_string(states_.size());
 }
 
