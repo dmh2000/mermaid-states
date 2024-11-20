@@ -1,12 +1,6 @@
 .PHONY: test
 
-all: staticcheck test
-	$(MAKE) -C statemachine
-
-test:
-	@echo "------test state-gen"
-	./test.sh
-
-staticcheck:
-	@echo "------staticcheck state-gen"
-	staticcheck .
+all:
+	$(MAKE) -s  -C cmd
+	$(MAKE) -s  -C pkg
+	$(MAKE) -s  -C internal

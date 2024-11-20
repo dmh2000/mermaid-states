@@ -1,8 +1,9 @@
-package stategen
+package parser
 
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -10,6 +11,9 @@ import (
 	"testing"
 )
 
+const testdir = "../../../test/"
+
+// TestCase represents a single test case for the parser
 type TestCase struct {
 	Name        string   `json:"name"`
 	Input       []string `json:"input"`
@@ -17,19 +21,25 @@ type TestCase struct {
 	WantInvalid []string `json:"wantInvalid"`
 }
 
+// TestSuite represents a collection of test cases
 type TestSuite struct {
 	Tests []TestCase `json:"tests"`
 }
 
+// loadTestCases loads test cases from the JSON file
 func loadTestCases(t *testing.T) []TestCase {
+	t.Helper()
+
 	// Get the absolute path to the test file
-	absPath, err := filepath.Abs("../../../test/tests.json")
-	if err != nil {
-		t.Fatalf("Failed to get absolute path: %v", err)
+	relPath := filepath.Clean(fmt.Sprintf("%s%s", testdir, "tests.json"))
+
+	// Verify the path is under the test directory
+	if !strings.HasPrefix(relPath, filepath.Clean(testdir)) {
+		t.Fatalf("Test file path escapes test directory")
 	}
 
 	// Read the test file
-	data, err := os.ReadFile(absPath)
+	data, err := os.ReadFile(relPath)
 	if err != nil {
 		t.Fatalf("Failed to read test file: %v", err)
 	}
@@ -61,15 +71,27 @@ func TestParser_ParseGraph(t *testing.T) {
 }
 
 func TestWithInputFile(t *testing.T) {
+	// Clean and verify input file path
+	inputPath := filepath.Clean(fmt.Sprintf("%s%s", testdir, "input.txt"))
+	if !strings.HasPrefix(inputPath, filepath.Clean(testdir)) {
+		t.Fatal("Input file path escapes test directory")
+	}
+
+	// Clean and verify output file path
+	outputPath := filepath.Clean(fmt.Sprintf("%s%s", testdir, "output.txt"))
+	if !strings.HasPrefix(outputPath, filepath.Clean(testdir)) {
+		t.Fatal("Output file path escapes test directory")
+	}
+
 	// Read input file
-	inputFile, err := os.Open("../../../test/input.txt")
+	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		t.Fatalf("Failed to open input file: %v", err)
 	}
 	defer inputFile.Close()
 
 	// Read output file
-	outputFile, err := os.Open("../../test/output.txt")
+	outputFile, err := os.Open(outputPath)
 	if err != nil {
 		t.Fatalf("Failed to open output file: %v", err)
 	}
@@ -89,28 +111,13 @@ func TestWithInputFile(t *testing.T) {
 	}
 
 	// Process input file
-	var inputLines []string
-	scanner = bufio.NewScanner(inputFile)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.TrimSpace(line) != "" {
-			inputLines = append(inputLines, line)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		t.Fatalf("Error reading input file: %v", err)
+	validResults, err := ProcessStateFile(inputFile, false)
+	if err != nil {
+		t.Fatalf("ProcessStateFile failed: %v", err)
 	}
 
-	// Parse input and compare with expected output
-	parser := NewParser()
-	gotValid, gotInvalid := parser.parseGraph(inputLines)
-
-	if len(gotInvalid) > 0 {
-		t.Errorf("Got unexpected invalid lines: %v", gotInvalid)
-	}
-
-	if !reflect.DeepEqual(gotValid, expectedOutput) {
-		t.Errorf("Parser output doesn't match expected output\nGot: %v\nWant: %v", gotValid, expectedOutput)
+	if !reflect.DeepEqual(validResults, expectedOutput) {
+		t.Errorf("Parser output doesn't match expected output\nGot: %v\nWant: %v", validResults, expectedOutput)
 	}
 }
 
@@ -144,6 +151,36 @@ func TestInvalidInputs(t *testing.T) {
 			_, gotInvalid := parser.parseGraph(tt.input)
 			if !reflect.DeepEqual(gotInvalid, tt.wantInvalid) {
 				t.Errorf("Parser.parseGraph() invalid = %v, want %v", gotInvalid, tt.wantInvalid)
+			}
+		})
+	}
+}
+
+func TestSecurityLimits(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
+	}{
+		{
+			name:    "line too long",
+			input:   strings.Repeat("a", maxLineLength+1),
+			wantErr: true,
+		},
+		{
+			name:    "too many lines",
+			input:   strings.Repeat("State1 --> State2\n", maxInputLines+1),
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := strings.NewReader(tt.input)
+			scanner := bufio.NewScanner(r)
+			_, _, err := processInput(scanner)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("processInput() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

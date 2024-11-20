@@ -4,6 +4,13 @@ import (
 	"testing"
 )
 
+const (
+	s1 StateKey = "state1"
+	s2 StateKey = "state2"
+	s3 StateKey = "state3"
+	s4 StateKey = "state4"
+)
+
 // TestStateMachineExecution tests the full execution of the state machine through all states.
 func TestStateMachineExecution(t *testing.T) {
 	// Create the state machine
@@ -14,38 +21,34 @@ func TestStateMachineExecution(t *testing.T) {
 
 	// Define states and their transitions
 	state1 := NewState(
-		STATE1,
-		"state1",
+		s1,
 		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
-			return STATE2, nil
+			return s2, nil
 		},
 	)
 
 	state2 := NewState(
-		STATE2,
-		"state2",
+		s2,
 		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
-			return STATE3, nil
+			return s3, nil
 		},
 	)
 
 	state3 := NewState(
-		STATE3,
-		"state3",
+		s3,
 		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
-			return STATE4, nil
+			return s4, nil
 		},
 	)
 
 	state4 := NewState(
-		STATE4,
-		"state4",
+		s4,
 		func(model *testModel, input int) (key StateKey, err error) {
 			model.value = input
-			return STATE4, nil
+			return s1, nil
 		},
 	)
 
@@ -65,14 +68,14 @@ func TestStateMachineExecution(t *testing.T) {
 
 	// Execute the state machine and step through all states
 	inputs := []int{10, 20, 30, 40}
-	expectedKeys := []StateKey{STATE2, STATE3, STATE4, STATE4} // Correct expected keys
+	expectedKeys := []StateKey{s2, s3, s4, s1}
 	for i, input := range inputs {
 		key, err := sm.Execute(&testModel{0}, input)
 		if err != nil {
 			t.Fatalf("unexpected error during execution: %s", err)
 		}
 		if key != expectedKeys[i] {
-			t.Errorf("unexpected state key: got %d, want %d", key, expectedKeys[i])
+			t.Errorf("unexpected state key: got %v, want %v", key, expectedKeys[i])
 		}
 	}
 }
@@ -84,7 +87,7 @@ func TestNilAction(t *testing.T) {
 			t.Error("expected panic for nil action")
 		}
 	}()
-	NewState[testModel, int](STATE1, "state1", nil)
+	NewState[testModel, int]("state1", nil)
 }
 
 // TestExecuteWithoutInitialState verifies proper error when executing without initial state
@@ -99,17 +102,16 @@ func TestExecuteWithoutInitialState(t *testing.T) {
 // TestGetStates verifies the GetStates method
 func TestGetStates(t *testing.T) {
 	sm := NewStateMachine[testModel, int](&testModel{0}, "test")
-	
+
 	states := []struct {
-		key  StateKey
-		name string
+		key StateKey
 	}{
-		{STATE1, "state1"},
-		{STATE2, "state2"},
+		{s1},
+		{s2},
 	}
 
 	for _, s := range states {
-		state := NewState(s.key, s.name,
+		state := NewState(s.key,
 			func(model *testModel, input int) (key StateKey, err error) {
 				return s.key, nil
 			},
@@ -126,9 +128,9 @@ func TestGetStates(t *testing.T) {
 
 	for _, s := range states {
 		if state, exists := allStates[s.key]; !exists {
-			t.Errorf("state %d not found", s.key)
-		} else if state.GetName() != s.name {
-			t.Errorf("expected name %s, got %s", s.name, state.GetName())
+			t.Errorf("state %v not found", s.key)
+		} else if state.GetKey() != s.key {
+			t.Errorf("expected key %s, got %s", s.key, state.GetKey())
 		}
 	}
 }

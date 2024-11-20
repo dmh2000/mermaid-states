@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	$(MAKE) -C go test
+	$(MAKE) -s  -C go test

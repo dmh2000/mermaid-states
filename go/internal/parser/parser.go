@@ -1,5 +1,6 @@
-// Package stategen ...
-package stategen
+// Package parser deconstructs a mermaid state diagram graph into a structured format.
+// It validates state names, transitions, and descriptions according to mermaid syntax rules.
+package parser
 
 import (
 	"bufio"
@@ -11,33 +12,57 @@ import (
 	"strings"
 )
 
-const placeholder = "-"
+const (
+	// placeholder is used when a transition has no description
+	placeholder = "-"
+	
+	// maxLineLength is the maximum allowed length of an input line
+	maxLineLength = 1000
+	
+	// maxInputLines is the maximum number of lines allowed in input
+	maxInputLines = 10000
+	
+	// Regular expression patterns
+	statePattern       = `^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$`
+	transitionPattern  = `^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$`
+	descriptionPattern = `^.+$`
+)
 
+// compile regular expressions once at package initialization
+var (
+	stateRegex       = regexp.MustCompile(statePattern)
+	transitionRegex  = regexp.MustCompile(transitionPattern)
+	descriptionRegex = regexp.MustCompile(descriptionPattern)
+)
+
+// Parser handles the parsing of mermaid state diagram syntax.
+// It validates state names, transitions, and descriptions.
 type Parser struct {
 	stateRegex       *regexp.Regexp
 	transitionRegex  *regexp.Regexp
 	descriptionRegex *regexp.Regexp
 }
 
+// NewParser creates a new Parser instance with compiled regular expressions.
 func NewParser() *Parser {
 	return &Parser{
-		// state names must start with letter or underscore, followed by letter, digit, or underscore
-		stateRegex: regexp.MustCompile(`^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$`),
-		// transitions must start with state name, followed by --> and another state name and optional description
-		transitionRegex: regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$`),
-		// descriptions must start with colon, followed by one or more characters
-		descriptionRegex: regexp.MustCompile(`^.+$`),
+		stateRegex:       stateRegex,
+		transitionRegex:  transitionRegex,
+		descriptionRegex: descriptionRegex,
 	}
 }
 
+// isValidState checks if a state name follows the required format.
 func (p *Parser) isValidState(state string) bool {
 	return p.stateRegex.MatchString(state)
 }
 
+// isValidTransition checks if a transition line follows the required format.
 func (p *Parser) isValidTransition(line string) bool {
 	return p.transitionRegex.MatchString(line)
 }
 
+// isValidDescription checks if a description is valid.
 func (p *Parser) isValidDescription(desc string) bool {
 	if desc == "" {
 		return true
@@ -102,21 +127,31 @@ func (p *Parser) parseInput(lines []string) ([]string, []string) {
 	return p.parseGraph(lines)
 }
 
-func processInput(scanner *bufio.Scanner) ([]string, []string) {
+// processInput reads lines from a scanner and parses them as a state diagram.
+// It returns valid and invalid results, or an error if the input is invalid.
+func processInput(scanner *bufio.Scanner) ([]string, []string, error) {
 	var lines []string
+	lineCount := 0
+
+	// Set maximum line length
+	scanner.Buffer(make([]byte, maxLineLength), maxLineLength)
 
 	// Read all input lines
 	for scanner.Scan() {
+		lineCount++
+		if lineCount > maxInputLines {
+			return nil, nil, fmt.Errorf("input exceeds maximum of %d lines", maxInputLines)
+		}
 		lines = append(lines, scanner.Text())
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
-		os.Exit(1)
+		return nil, nil, fmt.Errorf("error reading input: %w", err)
 	}
 
 	parser := NewParser()
-	return parser.parseInput(lines)
+	valid, invalid := parser.parseInput(lines)
+	return valid, invalid, nil
 }
 
 // ProcessStateFile processes a state definition file and returns the valid results
@@ -131,10 +166,12 @@ func ProcessStateFile(file *os.File, verbose bool) ([]string, error) {
 	}
 
 	scanner := bufio.NewScanner(file)
-	validResults, invalidResults := processInput(scanner)
+	validResults, invalidResults, err := processInput(scanner)
+	if err != nil {
+		return nil, fmt.Errorf("processing input: %w", err)
+	}
 
 	// If there are invalid results, create an error with the details
-	var err error
 	if len(invalidResults) > 0 {
 		// Log invalid results if verbose
 		for _, result := range invalidResults {
@@ -142,8 +179,8 @@ func ProcessStateFile(file *os.File, verbose bool) ([]string, error) {
 				log.Println(result)
 			}
 		}
-		err = fmt.Errorf("found %d invalid state definitions", len(invalidResults))
+		return validResults, fmt.Errorf("found %d invalid state definitions", len(invalidResults))
 	}
 
-	return validResults, err
+	return validResults, nil
 }
