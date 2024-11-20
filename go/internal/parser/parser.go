@@ -1,5 +1,8 @@
 // Package parser deconstructs a mermaid state diagram graph into a structured format.
-// It validates state names, transitions, and descriptions according to mermaid syntax rules.
+// this package is responsible for reading in a mermaid file, find any state transitions,
+// and output the valid transitions in a CSV format. anything not a valid transition
+// will be logged to stderr. that includes other Mermaid syntax, invalid state names,
+// invalid transition lines, and invalid descriptions
 package parser
 
 import (
@@ -15,13 +18,13 @@ import (
 const (
 	// placeholder is used when a transition has no description
 	placeholder = "-"
-	
+
 	// maxLineLength is the maximum allowed length of an input line
 	maxLineLength = 1000
-	
+
 	// maxInputLines is the maximum number of lines allowed in input
 	maxInputLines = 10000
-	
+
 	// Regular expression patterns
 	statePattern       = `^(?:[A-Za-z_][A-Za-z0-9_]*|\[\*\])$`
 	transitionPattern  = `^([A-Za-z_][A-Za-z0-9_]*|\[\*\])\s*-->\s*([A-Za-z_][A-Za-z0-9_]*|\[\*\])(?:\s*\:(.+))?$`

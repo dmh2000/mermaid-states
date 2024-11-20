@@ -1,4 +1,7 @@
 // Package graph creates the graph of states and transitions
+// this package inputs the .csv file produced by the parser, and
+// builds a directed graph of states and transitions. this graph
+// will be used to create the states for the state machine
 package graph
 
 import (
@@ -8,9 +11,9 @@ import (
 // Edge represents a directed edge in the graph with a description
 type Edge struct {
 	// From is the source node
-	From        string
+	From string
 	// To is the destination node
-	To          string
+	To string
 	// Description is the label or description of the edge
 	Description string
 }
@@ -21,22 +24,22 @@ func ParseEdge(t string) *Edge {
 	if t == "" {
 		return nil
 	}
-	
+
 	// split the input string into from, to, description strings separated by commas
 	fields := strings.Split(t, ",")
 	if len(fields) != 3 {
 		return nil
 	}
-	
+
 	// validate fields
 	from := strings.TrimSpace(fields[0])
 	to := strings.TrimSpace(fields[1])
 	desc := strings.TrimSpace(fields[2])
-	
+
 	if from == "" || to == "" {
 		return nil
 	}
-	
+
 	return &Edge{
 		From:        from,
 		To:          to,
@@ -71,10 +74,10 @@ func (g *Graph) AddEdge(edge *Edge) {
 	if edge == nil {
 		return
 	}
-	
+
 	// ensure the from node exists
 	g.AddNode(edge.From)
-	
+
 	// add the edge
 	g.Nodes[edge.From] = append(g.Nodes[edge.From], *edge)
 
