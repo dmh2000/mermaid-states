@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	stategen "sqirvy.xyz/state-gen/internal/parser"
+	graph "sqirvy.xyz/state-gen/internal/graph"
+	parser "sqirvy.xyz/state-gen/internal/parser"
 )
 
 func main() {
@@ -16,15 +17,20 @@ func main() {
 	exitCode := 0
 
 	// Process stdin using the new function
-	validResults, err := stategen.ProcessStateFile(os.Stdin, *verbose)
+	validResults, err := parser.ProcessStateFile(os.Stdin, *verbose)
 	if err != nil {
 		exitCode = 1
 	}
 
 	// Print valid results to stdout
-	for _, result := range validResults {
-		fmt.Println(result)
+	g := graph.NewGraph()
+	err = g.Load(validResults)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Load Error: %v\n", err)
+		os.Exit(1)
 	}
+
+	fmt.Println(g)
 
 	// Exit with the appropriate exit code
 	os.Exit(exitCode)
