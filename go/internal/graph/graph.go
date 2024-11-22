@@ -5,6 +5,7 @@
 package graph
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -20,15 +21,15 @@ type Edge struct {
 
 // ParseEdge parses a comma-separated string into an Edge
 // Format: "from,to,description"
-func ParseEdge(t string) *Edge {
+func ParseEdge(t string) (*Edge, error) {
 	if t == "" {
-		return nil
+		return nil, fmt.Errorf("syntax: empty edge")
 	}
 
 	// split the input string into from, to, description strings separated by commas
 	fields := strings.Split(t, ",")
 	if len(fields) != 3 {
-		return nil
+		return nil, fmt.Errorf("syntax: invalid edge format %v", t)
 	}
 
 	// validate fields
@@ -37,14 +38,15 @@ func ParseEdge(t string) *Edge {
 	desc := strings.TrimSpace(fields[2])
 
 	if from == "" || to == "" {
-		return nil
+		return nil, fmt.Errorf("syntax: invalid fromt/to format %v", t)
 	}
 
 	return &Edge{
-		From:        from,
-		To:          to,
-		Description: desc,
-	}
+			From:        from,
+			To:          to,
+			Description: desc,
+		},
+		nil
 }
 
 // Graph represents a directed graph using an adjacency list
@@ -85,13 +87,17 @@ func (g *Graph) AddEdge(edge *Edge) {
 	g.AddNode(edge.To)
 }
 
-func (g *Graph) Load(s []string) {
+func (g *Graph) Load(s []string) error {
 	for _, t := range s {
-		edge := ParseEdge(t)
+		edge, err := ParseEdge(t)
+		if err != nil {
+			return err
+		}
 		if edge != nil {
 			g.AddEdge(edge)
 		}
 	}
+	return nil
 }
 
 func (g *Graph) String() string {
