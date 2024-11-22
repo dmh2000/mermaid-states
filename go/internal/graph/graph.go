@@ -6,8 +6,11 @@ package graph
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
+
+var edgePattern = regexp.MustCompile(`^([^,]+),([^,]+),(.*)$`)
 
 // Edge represents a directed edge in the graph with a description
 type Edge struct {
@@ -26,16 +29,16 @@ func ParseEdge(t string) (*Edge, error) {
 		return nil, fmt.Errorf("syntax: empty edge")
 	}
 
-	// split the input string into from, to, description strings separated by commas
-	fields := strings.Split(t, ",")
-	if len(fields) != 3 {
+	// use regex to capture the three parts
+	matches := edgePattern.FindStringSubmatch(t)
+	if matches == nil || len(matches) != 4 {
 		return nil, fmt.Errorf("syntax: invalid edge format %v", t)
 	}
 
-	// validate fields
-	from := strings.TrimSpace(fields[0])
-	to := strings.TrimSpace(fields[1])
-	desc := strings.TrimSpace(fields[2])
+	// validate fields (matches[0] is the full match)
+	from := strings.TrimSpace(matches[1])
+	to := strings.TrimSpace(matches[2])
+	desc := strings.TrimSpace(matches[3])
 
 	if from == "" || to == "" {
 		return nil, fmt.Errorf("syntax: invalid fromt/to format %v", t)
