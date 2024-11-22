@@ -73,7 +73,7 @@ func (p *Parser) isValidDescription(desc string) bool {
 	return p.descriptionRegex.MatchString(desc)
 }
 
-func (p *Parser) parseGraph(lines []string) ([]string, []string) {
+func (p *Parser) parseMermaid(lines []string) ([]string, []string) {
 	var validResults []string
 	var invalidResults []string
 	indent := 0
@@ -91,6 +91,13 @@ func (p *Parser) parseGraph(lines []string) ([]string, []string) {
 			description := ""
 			if len(matches) > 3 {
 				description = matches[3]
+			}
+
+			if fromState == "[*]" {
+				fromState = "START"
+			}
+			if toState == "[*]" {
+				toState = "END"
 			}
 
 			if p.isValidState(fromState) && p.isValidState(toState) &&
@@ -127,7 +134,7 @@ func (p *Parser) parseInput(lines []string) ([]string, []string) {
 		return nil, []string{"Error: Graph must contain at least one transition"}
 	}
 
-	return p.parseGraph(lines)
+	return p.parseMermaid(lines)
 }
 
 // processInput reads lines from a scanner and parses them as a state diagram.

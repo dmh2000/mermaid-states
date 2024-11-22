@@ -1,6 +1,10 @@
 .PHONY: test
 
-all: staticcheck test
+all: header staticcheck test
+
+header:
+	@echo "------------------ GRAPH ------------------ "
+
 
 test:
 	@echo "------test graph"

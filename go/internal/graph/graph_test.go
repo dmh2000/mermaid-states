@@ -9,7 +9,7 @@ import (
 
 const testdir = "../../../test/"
 
-func TestParseEdge(t *testing.T) {
+func TestParseValidEdge(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -24,6 +24,43 @@ func TestParseEdge(t *testing.T) {
 				Description: "c",
 			},
 		},
+		{
+			name:  "whitespace handling",
+			input: " a , b , c ",
+			wantEdge: &Edge{
+				From:        "a",
+				To:          "b",
+				Description: "c",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseEdge(tt.input)
+			if err != nil {
+				t.Errorf("ParseEdge() error = %v", err)
+				return
+			}
+			if (got == nil) != (tt.wantEdge == nil) {
+				t.Errorf("ParseEdge() = %v, want %v", got, tt.wantEdge)
+				return
+			}
+			if got != nil {
+				if got.From != tt.wantEdge.From || got.To != tt.wantEdge.To || got.Description != tt.wantEdge.Description {
+					t.Errorf("ParseEdge() = %v, want %v", got, tt.wantEdge)
+				}
+			}
+		})
+	}
+}
+
+func TestParseInvalidEdge(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		wantEdge *Edge
+	}{
 		{
 			name:     "empty string",
 			input:    "",
@@ -44,20 +81,15 @@ func TestParseEdge(t *testing.T) {
 			input:    "a,,c",
 			wantEdge: nil,
 		},
-		{
-			name: "whitespace handling",
-			input: " a , b , c ",
-			wantEdge: &Edge{
-				From:        "a",
-				To:          "b",
-				Description: "c",
-			},
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ParseEdge(tt.input)
+			got, err := ParseEdge(tt.input)
+			if err == nil {
+				t.Errorf("expected error, got nil")
+				return
+			}
 			if (got == nil) != (tt.wantEdge == nil) {
 				t.Errorf("ParseEdge() = %v, want %v", got, tt.wantEdge)
 				return
@@ -73,36 +105,36 @@ func TestParseEdge(t *testing.T) {
 
 func TestGraph(t *testing.T) {
 	g := NewGraph()
-	
+
 	// Test empty graph
 	if len(g.Nodes) != 0 {
 		t.Error("new graph should be empty")
 	}
-	
+
 	// Test adding nodes
 	g.AddNode("a")
 	if len(g.Nodes["a"]) != 0 {
 		t.Error("new node should have no edges")
 	}
-	
+
 	// Test adding same node twice
 	g.AddNode("a")
 	if len(g.Nodes) != 1 {
 		t.Error("adding same node twice should not create duplicate")
 	}
-	
+
 	// Test adding edge
 	edge := &Edge{From: "a", To: "b", Description: "test"}
 	g.AddEdge(edge)
-	
+
 	if len(g.Nodes["a"]) != 1 {
 		t.Error("edge not added to from node")
 	}
-	
+
 	if _, exists := g.Nodes["b"]; !exists {
 		t.Error("to node not created")
 	}
-	
+
 	// Test nil edge
 	g.AddEdge(nil)
 	if len(g.Nodes["a"]) != 1 {
@@ -124,13 +156,30 @@ func TestLoad1(t *testing.T) {
 func TestLoad2(t *testing.T) {
 
 	// read the test/graph.txt file and convert it to a slice of strings
-	lines, err := os.ReadFile(fmt.Sprintf("%s%s", testdir, "graph.txt"))
+	lines, err := os.ReadFile(fmt.Sprintf("%s%s", testdir, "graph2.txt"))
 	if err != nil {
 		t.Fatalf("Failed to read test file: %v", err)
 	}
 
 	g := NewGraph()
 	g.Load(strings.Split(string(lines), "\n"))
+
+	t.Log(g)
+}
+
+func TestLoad3(t *testing.T) {
+
+	// read the test/graph.txt file and convert it to a slice of strings
+	lines, err := os.ReadFile(fmt.Sprintf("%s%s", testdir, "graph3.txt"))
+	if err != nil {
+		t.Fatalf("Failed to read test file: %v", err)
+	}
+
+	g := NewGraph()
+	err = g.Load(strings.Split(string(lines), "\n"))
+	if err != nil {
+		t.Fatalf("Load Error: %v\n", err)
+	}
 
 	t.Log(g)
 }

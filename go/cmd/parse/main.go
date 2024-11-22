@@ -15,7 +15,7 @@ func main() {
 	flag.Parse()
 
 	exitCode := 0
-	var input *os.File = os.Stdin
+	var input = os.Stdin
 	var err error
 
 	// If there's a non-flag argument, treat it as input file

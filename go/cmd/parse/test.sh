@@ -16,7 +16,6 @@ echo "State1g --> [*] : description text" | go run . -v
 echo "State1h --> [*]:description text" | go run . -v
 echo "State1i --> [*]: description text" | go run . -v
 echo "State1j --> [*] :description text" | go run . -v
-
 echo "A --> B: :.,?!@=~" | go run . -v
 echo "A --> B::.,?!@=~" | go run . -v
 echo "A --> B: : .,?!@=~" | go run . -v

@@ -30,13 +30,13 @@ func TestAddState(t *testing.T) {
 		t.Errorf("unexpected state machine string: %s", sm.String())
 	}
 
-	// add a state
 	state := NewState(
 		"state1",
-		func(model *testModel, input int) (key StateKey, err error) {
+		func(state *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
 			model.value = input
 			return "", nil
 		},
+		nil,
 	)
 
 	if err := sm.AddState(state); err != nil {
@@ -64,13 +64,17 @@ func TestSetInitialState(t *testing.T) {
 		t.Errorf("unexpected state machine string: %s", sm.String())
 	}
 
-	// add a state1
+	// state function
+	fstate1 := func(state *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+		model.value = input
+		return "", nil
+	}
+
+	// add  state1
 	state1 := NewState(
 		"state1",
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s1, nil
-		},
+		fstate1,
+		nil,
 	)
 
 	if err := sm.AddState(state1); err != nil {
@@ -86,13 +90,15 @@ func TestSetInitialState(t *testing.T) {
 		t.Errorf("unexpected state string: %s", s)
 	}
 
+	fstate2 := func(state *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+		model.value = input
+		return s2, nil
+	}
 	// add a state
 	state2 := NewState(
 		"state2",
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s2, nil
-		},
+		fstate2,
+		nil,
 	)
 
 	if err := sm.AddState(state2); err != nil {

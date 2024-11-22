@@ -24,6 +24,7 @@ type Edge struct {
 
 // ParseEdge parses a comma-separated string into an Edge
 // Format: "from,to,description"
+// ParseEdge assumes
 func ParseEdge(t string) (*Edge, error) {
 	if t == "" {
 		return nil, fmt.Errorf("syntax: empty edge")

@@ -9,7 +9,10 @@ import (
 type StateKey string
 
 // ActionFunc is called when a state is executed.
-type ActionFunc[Model any, Input any] func(model *Model, input Input) (key StateKey, err error)
+// @param current The current state.
+// @param model The data associated with the statemachine
+// @param input The input type.
+type ActionFunc[Model any, Input any] func(current *State[Model, Input], model *Model, input Input) (key StateKey, err error)
 
 // String returns the string representation of the state key.
 func (k StateKey) String() string {
@@ -19,7 +22,8 @@ func (k StateKey) String() string {
 // State represents a state in the state machine with a key, name, and action.
 type State[Model any, Input any] struct {
 	Key    StateKey
-	action ActionFunc[Model, Input]
+	Action ActionFunc[Model, Input]
+	Data   *interface{}
 }
 
 // String returns the string representation of the state.
@@ -34,20 +38,22 @@ func (s *State[Model, Input]) GetKey() StateKey {
 
 // Execute performs the state's action and returns the key of the next state.
 func (s *State[Model, Input]) Execute(model *Model, input Input) (key StateKey, err error) {
-	return s.action(model, input)
+	return s.Action(s, model, input)
 }
 
 // NewState creates a new state with the given key and action.
 func NewState[Model any, Input any](
 	key StateKey,
 	act ActionFunc[Model, Input],
+	data *interface{},
 ) *State[Model, Input] {
-	if act == nil {
-		panic("action function cannot be nil")
+	if act == nil || key == "" {
+		return nil
 	}
 	return &State[Model, Input]{
 		Key:    key,
-		action: act,
+		Action: act,
+		Data:   data,
 	}
 }
 

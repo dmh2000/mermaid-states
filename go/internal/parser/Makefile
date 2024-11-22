@@ -1,6 +1,11 @@
 .PHONY: test
 
-all: staticcheck test
+all: header staticcheck test
+
+header:
+	@echo "------------------ PARSER ------------------"
+	       
+
 
 test:
 	@echo "------test parser"

@@ -1,10 +1,13 @@
 .PHONY: test
 
-all: staticcheck test
+all: header staticcheck test
+
+header:
+	@echo "================== CMD/PARSE ================== "
 
 test:
 	@echo "------test parse"
-	./test.sh
+	@echo " TO TEST, RUN ./test.sh in the terminal"
 
 staticcheck:
 	@echo "------staticcheck parse"
