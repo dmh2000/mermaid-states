@@ -15,9 +15,22 @@ func main() {
 	flag.Parse()
 
 	exitCode := 0
+	var input *os.File = os.Stdin
+	var err error
 
-	// Process stdin using the new function
-	validResults, err := parser.ProcessStateFile(os.Stdin, *verbose)
+	// If there's a non-flag argument, treat it as input file
+	if flag.NArg() > 0 {
+		filename := flag.Arg(0)
+		input, err = os.Open(filename)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+			os.Exit(1)
+		}
+		defer input.Close()
+	}
+
+	// Process input using the parser
+	validResults, err := parser.ProcessStateFile(input, *verbose)
 	if err != nil {
 		exitCode = 1
 	}
