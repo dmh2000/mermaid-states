@@ -1,0 +1,18 @@
+State1a,State2a,_
+State1b,State2b, : description text
+State1c,State2c,:description text
+State1d,State2d,: description text
+State1e,State2e, :description text
+START,State2f, _
+START,State2g, : description text
+START,State2h,:description text
+START,State2i,: description text
+START,State2j, :description text
+State1f,END, _
+State1g,END, : description text
+State1h,END,:description text
+State1i,END,: description text
+State1j,END, :description text
+A,B,: :.,?!@=~
+A,B,::.,?!@=~
+A,B,: : .,?!@=~

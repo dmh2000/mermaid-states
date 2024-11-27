@@ -11,6 +11,26 @@ const (
 	s4 StateKey = "state4"
 )
 
+func fstate1(s *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+	model.value = input
+	return s2, nil
+}
+
+func fstate2(s *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+	model.value = input
+	return s3, nil
+}
+
+func fstate3(s *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+	model.value = input
+	return s4, nil
+}
+
+func fstate4(s *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+	model.value = input
+	return s1, nil
+}
+
 // TestStateMachineExecution tests the full execution of the state machine through all states.
 func TestStateMachineExecution(t *testing.T) {
 	// Create the state machine
@@ -22,34 +42,26 @@ func TestStateMachineExecution(t *testing.T) {
 	// Define states and their transitions
 	state1 := NewState(
 		s1,
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s2, nil
-		},
+		fstate1,
+		nil,
 	)
 
 	state2 := NewState(
 		s2,
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s3, nil
-		},
+		fstate2,
+		nil,
 	)
 
 	state3 := NewState(
 		s3,
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s4, nil
-		},
+		fstate3,
+		nil,
 	)
 
 	state4 := NewState(
 		s4,
-		func(model *testModel, input int) (key StateKey, err error) {
-			model.value = input
-			return s1, nil
-		},
+		fstate4,
+		nil,
 	)
 
 	// Add states to the state machine
@@ -80,14 +92,12 @@ func TestStateMachineExecution(t *testing.T) {
 	}
 }
 
-// TestNilAction verifies that NewState panics with nil action
+// TestNilAction verifies that NewState returns nil if the key is an empty stringor action is nil
 func TestNilAction(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("expected panic for nil action")
-		}
-	}()
-	NewState[testModel, int]("state1", nil)
+	s := NewState[any, any]("", nil, nil)
+	if s != nil {
+		t.Errorf("expected nil state, got %v", s)
+	}
 }
 
 // TestExecuteWithoutInitialState verifies proper error when executing without initial state
@@ -112,9 +122,10 @@ func TestGetStates(t *testing.T) {
 
 	for _, s := range states {
 		state := NewState(s.key,
-			func(model *testModel, input int) (key StateKey, err error) {
-				return s.key, nil
+			func(x *State[testModel, int], model *testModel, input int) (key StateKey, err error) {
+				return x.Key, nil
 			},
+			nil,
 		)
 		if err := sm.AddState(state); err != nil {
 			t.Fatalf("unexpected error: %s", err)

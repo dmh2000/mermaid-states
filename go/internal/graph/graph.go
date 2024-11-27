@@ -5,8 +5,12 @@
 package graph
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 )
+
+var edgePattern = regexp.MustCompile(`^([^,]+),([^,]+),(.*)$`)
 
 // Edge represents a directed edge in the graph with a description
 type Edge struct {
@@ -20,31 +24,33 @@ type Edge struct {
 
 // ParseEdge parses a comma-separated string into an Edge
 // Format: "from,to,description"
-func ParseEdge(t string) *Edge {
+// ParseEdge assumes
+func ParseEdge(t string) (*Edge, error) {
 	if t == "" {
-		return nil
+		return nil, fmt.Errorf("syntax: empty edge")
 	}
 
-	// split the input string into from, to, description strings separated by commas
-	fields := strings.Split(t, ",")
-	if len(fields) != 3 {
-		return nil
+	// use regex to capture the three parts
+	matches := edgePattern.FindStringSubmatch(t)
+	if matches == nil || len(matches) != 4 {
+		return nil, fmt.Errorf("syntax: invalid edge format %v", t)
 	}
 
-	// validate fields
-	from := strings.TrimSpace(fields[0])
-	to := strings.TrimSpace(fields[1])
-	desc := strings.TrimSpace(fields[2])
+	// validate fields (matches[0] is the full match)
+	from := strings.TrimSpace(matches[1])
+	to := strings.TrimSpace(matches[2])
+	desc := strings.TrimSpace(matches[3])
 
 	if from == "" || to == "" {
-		return nil
+		return nil, fmt.Errorf("syntax: invalid fromt/to format %v", t)
 	}
 
 	return &Edge{
-		From:        from,
-		To:          to,
-		Description: desc,
-	}
+			From:        from,
+			To:          to,
+			Description: desc,
+		},
+		nil
 }
 
 // Graph represents a directed graph using an adjacency list
@@ -85,13 +91,17 @@ func (g *Graph) AddEdge(edge *Edge) {
 	g.AddNode(edge.To)
 }
 
-func (g *Graph) Load(s []string) {
+func (g *Graph) Load(s []string) error {
 	for _, t := range s {
-		edge := ParseEdge(t)
+		edge, err := ParseEdge(t)
+		if err != nil {
+			return err
+		}
 		if edge != nil {
 			g.AddEdge(edge)
 		}
 	}
+	return nil
 }
 
 func (g *Graph) String() string {

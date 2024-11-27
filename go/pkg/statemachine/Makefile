@@ -2,6 +2,9 @@
 
 all: staticcheck test
 
+header:
+	@echo ------------------ STATEMACHINE ------------------
+
 test:
 	@echo "------test statemachine"
 	go test -timeout 30s .
