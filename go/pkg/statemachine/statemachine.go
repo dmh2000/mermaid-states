@@ -8,10 +8,9 @@ import (
 // StateKey represents a unique key for a state in the state machine.
 type StateKey string
 
-// ActionFunc is called when a state is executed.
-// @param current The current state.
-// @param model The data associated with the statemachine
-// @param input The input type.
+// ActionFunc defines the function signature for state actions.
+// It receives the current state, model data, and input,
+// and returns the next state key and any error.
 type ActionFunc[Model any, Input any] func(current *State[Model, Input], model *Model, input Input) (key StateKey, err error)
 
 // String returns the string representation of the state key.

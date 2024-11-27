@@ -1,7 +1,6 @@
-// Package graph creates the graph of states and transitions
-// this package inputs the .csv file produced by the parser, and
-// builds a directed graph of states and transitions. this graph
-// will be used to create the states for the state machine
+// Package graph creates a directed graph of states and transitions.
+// It processes CSV input from the parser to build a graph structure
+// that will be used to generate state machine states.
 package graph
 
 import (
@@ -42,7 +41,7 @@ func ParseEdge(t string) (*Edge, error) {
 	desc := strings.TrimSpace(matches[3])
 
 	if from == "" || to == "" {
-		return nil, fmt.Errorf("syntax: invalid fromt/to format %v", t)
+		return nil, fmt.Errorf("syntax: invalid from/to format %v", t)
 	}
 
 	return &Edge{

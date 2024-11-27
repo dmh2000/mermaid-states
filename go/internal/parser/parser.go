@@ -1,8 +1,8 @@
-// Package parser deconstructs a mermaid state diagram graph into a structured format.
-// this package is responsible for reading in a mermaid file, find any state transitions,
-// and output the valid transitions in a CSV format. anything not a valid transition
-// will be logged to stderr. that includes other Mermaid syntax, invalid state names,
-// invalid transition lines, and invalid descriptions
+// Package parser deconstructs a Mermaid state diagram graph into a structured format.
+// This package is responsible for reading in a Mermaid file, finding state transitions,
+// and outputting valid transitions in CSV format. Anything not a valid transition
+// will be logged to stderr. This includes other Mermaid syntax, invalid state names,
+// invalid transition lines, and invalid descriptions.
 package parser
 
 import (
