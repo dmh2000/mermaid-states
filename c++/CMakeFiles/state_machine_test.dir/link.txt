@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/state_machine_test.dir/test/state_machine_test.cpp.o -o state_machine_test  lib/libgtest.a lib/libgtest_main.a lib/libgtest.a 

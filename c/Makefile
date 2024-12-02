@@ -1,34 +1,35 @@
-MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
-
-
 CC = gcc
-CFLAGS = -Wall -Wextra -I.
-LDFLAGS =
+CFLAGS = -Wall -Wno-unused-parameter -Wextra -I./include
+LDFLAGS = 
 
-LIB_SOURCES = state_machine.c
-LIB_OBJECTS = $(LIB_SOURCES:.c=.o)
-LIB = libstatemachine.a
+SRC_DIR = src
+TEST_DIR = test
+OBJ_DIR = obj
 
-TEST_SOURCES = test_state_machine.c
-TEST_OBJECTS = $(TEST_SOURCES:.c=.o)
-TEST = test_state_machine
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.c)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+TEST_OBJS = $(TEST_SRCS:$(TEST_DIR)/%.c=$(OBJ_DIR)/%.o)
+
+TEST_BINARY = test_state_machine
 
 .PHONY: all clean test
 
-all: $(LIB) $(TEST)
+all: $(TEST_BINARY)
 
-$(LIB): $(LIB_OBJECTS)
-	ar rcs $@ $^
-
-$(TEST): $(TEST_OBJECTS) $(LIB)
-	$(CC) $(TEST_OBJECTS) -L. -lstatemachine -o $@ $(LDFLAGS)
-
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test: $(TEST)
-	./$(TEST)
+$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-clean: header
-	rm -f $(LIB_OBJECTS) $(TEST_OBJECTS) $(LIB) $(TEST)
+$(TEST_BINARY): $(OBJS) $(TEST_OBJS)
+	$(CC) $(OBJS) $(TEST_OBJS) $(LDFLAGS) -o $@
+
+test: $(TEST_BINARY)
+	./$(TEST_BINARY)
+
+clean:
+	rm -rf $(OBJ_DIR) $(TEST_BINARY)
