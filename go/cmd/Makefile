@@ -6,5 +6,8 @@ header:
 all: header
 	$(MAKE) -s  -C parse
 
+test: header
+	$(MAKE) -s -C parse test
+
 clean: header
 	$(MAKE) -s -C parse clean

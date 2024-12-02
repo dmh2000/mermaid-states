@@ -8,6 +8,11 @@ all: header
 	$(MAKE) -s  -C graph
 	$(MAKE) -s  -C build
 
+test: header
+	$(MAKE) -s -C parser test
+	$(MAKE) -s -C graph test
+	$(MAKE) -s -C build test
+
 clean: header
 	$(MAKE) -s -C parser clean
 	$(MAKE) -s -C graph clean
