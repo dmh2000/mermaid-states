@@ -7,7 +7,7 @@ header:
 
 test:
 	@echo "------test statemachine"
-	go test -v -count=1 -timeout 30s .
+	go test -count=1 -timeout 30s .
 
 staticcheck:
 	@echo "------staticcheck statemachine"

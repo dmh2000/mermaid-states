@@ -19,3 +19,5 @@ echo "State1j --> [*] :description text" | go run . -v
 echo "A --> B: :.,?!@=~" | go run . -v
 echo "A --> B::.,?!@=~" | go run . -v
 echo "A --> B: : .,?!@=~" | go run . -v
+echo "the following test should fail"
+echo "123" | go run . -v || true

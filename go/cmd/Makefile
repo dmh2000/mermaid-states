@@ -1,7 +1,5 @@
-.PHONY: test clean
+.PHONY: all header test clean
 
-header: 
-	@echo "================== CMD =================="
 
 all: header
 	$(MAKE) -s  -C parse
@@ -11,3 +9,6 @@ test: header
 
 clean: header
 	$(MAKE) -s -C parse clean
+
+header: 
+	@echo "================== CMD =================="

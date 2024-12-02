@@ -1,7 +1,4 @@
-.PHONY: test clean
-
-header: 
-	@echo "================== GO =================="
+.PHONY: all header test clean
 
 all: header
 	$(MAKE) -s  -C cmd
@@ -17,3 +14,7 @@ clean: header
 	$(MAKE) -s -C cmd clean
 	$(MAKE) -s -C pkg clean
 	$(MAKE) -s -C internal clean
+
+
+header: 
+	@echo "================== GO =================="

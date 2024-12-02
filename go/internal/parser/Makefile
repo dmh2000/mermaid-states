@@ -1,14 +1,10 @@
-.PHONY: test clean
+.PHONY: all headertest clean
 
 all: header staticcheck test
 
-header:
-	@echo "------------------ PARSER ------------------"
-	       
-
 test:
 	@echo "------test parser"
-	go test -v -count=1 -timeout 30s .
+	go test -count=1 -timeout 30s .
 
 staticcheck:
 	@echo "------staticcheck parser"
@@ -17,3 +13,7 @@ staticcheck:
 clean: header
 	rm -f *.o
 	go clean
+
+header:
+	@echo "------------------ PARSER ------------------"
+	       

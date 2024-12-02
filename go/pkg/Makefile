@@ -1,7 +1,4 @@
-.PHONY: test clean
-
-header: 
-	@echo "================== PKG =================="
+.PHONY: all headertest clean
 
 all: header
 	$(MAKE) -s  -C statemachine
@@ -11,3 +8,6 @@ test: header
 
 clean: header
 	$(MAKE) -s -C statemachine clean
+
+header: 
+	@echo "================== PKG =================="
