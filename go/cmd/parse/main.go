@@ -32,6 +32,7 @@ func main() {
 	// Process input using the parser
 	validResults, err := parser.ProcessStateFile(input, *verbose)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error processing input: %v\n", err)
 		exitCode = 1
 	}
 

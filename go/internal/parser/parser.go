@@ -73,7 +73,7 @@ func (p *Parser) isValidDescription(desc string) bool {
 	return p.descriptionRegex.MatchString(desc)
 }
 
-func (p *Parser) parseMermaid(lines []string) ([]string, []string) {
+func (p *Parser) parseMermaid(lines []string) ([]string, []string, error) {
 	var validResults []string
 	var invalidResults []string
 	indent := 0
@@ -117,21 +117,23 @@ func (p *Parser) parseMermaid(lines []string) ([]string, []string) {
 		}
 	}
 
-	return validResults, invalidResults
+	return validResults, invalidResults, nil
 }
 
-func (p *Parser) parseInput(lines []string) ([]string, []string) {
+func (p *Parser) parseInput(lines []string) ([]string, []string, error) {
 	// Verify there is at least one transition
 	hasValidTransition := false
+	invalidTransitions := []string{}
 	for _, line := range lines {
 		if strings.TrimSpace(line) != "" && p.isValidTransition(strings.TrimSpace(line)) {
 			hasValidTransition = true
 			break
 		}
+		invalidTransitions = append(invalidTransitions, fmt.Sprintf("error: invalid transition: %s", line))
 	}
 
 	if !hasValidTransition {
-		return nil, []string{"Error: Graph must contain at least one transition"}
+		return nil, nil, fmt.Errorf("error: graph must contain at least one transition : %v", invalidTransitions)
 	}
 
 	return p.parseMermaid(lines)
@@ -160,8 +162,8 @@ func processInput(scanner *bufio.Scanner) ([]string, []string, error) {
 	}
 
 	parser := NewParser()
-	valid, invalid := parser.parseInput(lines)
-	return valid, invalid, nil
+	valid, invalid, err := parser.parseInput(lines)
+	return valid, invalid, err
 }
 
 // ProcessStateFile processes a state definition file and returns the valid results

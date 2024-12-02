@@ -59,7 +59,10 @@ func TestParser_ParseGraph(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			gotValid, gotInvalid := parser.parseMermaid(tt.Input)
+			gotValid, gotInvalid, err := parser.parseMermaid(tt.Input)
+			if err != nil {
+				t.Errorf("Parser.parseGraph() error = %v", err)
+			}
 			if !reflect.DeepEqual(gotValid, tt.WantValid) {
 				t.Errorf("Parser.parseGraph() valid = %v, want %v", gotValid, tt.WantValid)
 			}
@@ -148,7 +151,7 @@ func TestInvalidInputs(t *testing.T) {
 
 	for _, tt := range invalidInputs {
 		t.Run(tt.name, func(t *testing.T) {
-			_, gotInvalid := parser.parseMermaid(tt.input)
+			_, gotInvalid, _ := parser.parseMermaid(tt.input)
 			if !reflect.DeepEqual(gotInvalid, tt.wantInvalid) {
 				t.Errorf("Parser.parseGraph() invalid = %v, want %v", gotInvalid, tt.wantInvalid)
 			}

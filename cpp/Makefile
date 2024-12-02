@@ -1,3 +1,7 @@
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
+
+
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -I.
 LDFLAGS =
@@ -19,5 +23,5 @@ $(TARGET): $(OBJECTS)
 test: $(TARGET)
 	./$(TARGET)
 
-clean:
+clean: header
 	rm -f $(OBJECTS) $(TARGET)

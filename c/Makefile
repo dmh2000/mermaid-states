@@ -1,3 +1,7 @@
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
+
+
 CC = gcc
 CFLAGS = -Wall -Wextra -I.
 LDFLAGS =
@@ -26,5 +30,5 @@ $(TEST): $(TEST_OBJECTS) $(LIB)
 test: $(TEST)
 	./$(TEST)
 
-clean:
+clean: header
 	rm -f $(LIB_OBJECTS) $(TEST_OBJECTS) $(LIB) $(TEST)

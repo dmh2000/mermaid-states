@@ -1,15 +1,22 @@
-.PHONY: test
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
+
+
+.PHONY: test clean
 
 all: header staticcheck test
 
-header:
-	@echo "------------------ GRAPH ------------------ "
-
-
 test:
 	@echo "------test graph"
-	go test -timeout 30s .
+	go test -count=1 -timeout 30s .
 
 staticcheck:
 	@echo "------staticcheck graph"
 	staticcheck .
+
+clean: header
+	rm -f *.o
+	go clean
+
+header:
+	@echo "------------------" $(CURRENT_PATH)
