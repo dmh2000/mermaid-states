@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "state_machine.h"
+#include "../include/state_machine.h"
 
 #define BUFFER_SIZE 256
 
