@@ -3,7 +3,7 @@
 all: header staticcheck test
 
 header:
-	@echo "================== CMD/PARSE ================== "
+	@echo "------------------ CMD/PARSE ------------------"
 
 test:
 	@echo "------test parse"
@@ -12,3 +12,7 @@ test:
 staticcheck:
 	@echo "------staticcheck parse"
 	staticcheck .
+
+clean: header
+	rm -f *.o
+	go clean

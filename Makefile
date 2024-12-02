@@ -1,4 +1,10 @@
-.PHONY: all
+.PHONY: all clean
 
-all:
+header: 
+	@echo "================== MERMAID =================="
+
+all: header
 	$(MAKE) -s  -C go 
+
+clean: header
+	$(MAKE) -s -C go clean

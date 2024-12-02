@@ -5,7 +5,11 @@ header:
 
 test:
 	@echo "------test build"
-	go test -timeout 30s .
+	go test -v -count=1 -timeout 30s .
 
 staticcheck:
 	@echo "------staticcheck build"
+
+clean: header
+	rm -f *.o
+	go clean

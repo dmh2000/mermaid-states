@@ -19,5 +19,5 @@ $(TARGET): $(OBJECTS)
 test: $(TARGET)
 	./$(TARGET)
 
-clean:
+clean: header
 	rm -f $(OBJECTS) $(TARGET)

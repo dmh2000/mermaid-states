@@ -1,14 +1,18 @@
-.PHONY: test
+.PHONY: test clean
 
-all: staticcheck test
+all: header staticcheck test
 
 header:
-	@echo ------------------ STATEMACHINE ------------------
+	@echo ------------------ PKG/STATEMACHINE ------------------
 
 test:
 	@echo "------test statemachine"
-	go test -timeout 30s .
+	go test -v -count=1 -timeout 30s .
 
 staticcheck:
 	@echo "------staticcheck statemachine"
 	staticcheck .
+
+clean: header
+	rm -f *.o
+	go clean

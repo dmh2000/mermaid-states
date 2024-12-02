@@ -26,5 +26,5 @@ $(TEST): $(TEST_OBJECTS) $(LIB)
 test: $(TEST)
 	./$(TEST)
 
-clean:
+clean: header
 	rm -f $(LIB_OBJECTS) $(TEST_OBJECTS) $(LIB) $(TEST)
