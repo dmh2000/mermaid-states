@@ -1,3 +1,5 @@
+
+
 .PHONY: all headertest clean
 
 all: header
@@ -10,4 +12,4 @@ clean: header
 	$(MAKE) -s -C statemachine clean
 
 header: 
-	@echo "================== PKG =================="
+	@echo "==================" $(shell basename $(PWD)) "=================="

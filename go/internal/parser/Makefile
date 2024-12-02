@@ -1,3 +1,5 @@
+
+
 .PHONY: all headertest clean
 
 all: header staticcheck test
@@ -15,5 +17,4 @@ clean: header
 	go clean
 
 header:
-	@echo "------------------ PARSER ------------------"
-	       
+	@echo "------------------" $(shell basename $(PWD)) "------------------"

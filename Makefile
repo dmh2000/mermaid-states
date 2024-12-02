@@ -1,3 +1,5 @@
+
+
 .PHONY: all clean header test
 
 
@@ -11,4 +13,4 @@ test: header
 	$(MAKE) -s -C go test
 
 header: 
-	@echo "================== MERMAID =================="
+	@echo "==================" $(shell basename $(PWD)) "=================="

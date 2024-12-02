@@ -1,3 +1,5 @@
+
+
 .PHONY: all header test clean
 
 
@@ -17,4 +19,4 @@ clean: header
 	$(MAKE) -s -C build clean
 
 header: 
-	@echo "================== INTERNAL =================="
+			@echo "==================" $(shell basename $(PWD)) "=================="

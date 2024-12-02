@@ -1,3 +1,5 @@
+
+
 .PHONY: test clean
 
 all: header staticcheck test
@@ -15,4 +17,4 @@ clean: header
 	go clean
 
 header:
-	@echo "------------------ GRAPH ------------------ "
+	@echo "------------------" $(shell basename $(PWD)) "------------------"

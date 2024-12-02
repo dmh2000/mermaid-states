@@ -1,3 +1,5 @@
+
+
 .PHONY: all header test clean
 
 all: header
@@ -17,4 +19,4 @@ clean: header
 
 
 header: 
-	@echo "================== GO =================="
+		@echo "==================" $(shell basename $(PWD)) "=================="

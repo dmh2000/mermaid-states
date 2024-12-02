@@ -11,4 +11,4 @@ clean: header
 	$(MAKE) -s -C parse clean
 
 header: 
-	@echo "================== CMD =================="
+	@echo "------------------" $(CURRENT_PATH) "------------------"

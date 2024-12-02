@@ -1,3 +1,5 @@
+
+
 .PHONY: all header test clean
 all: header staticcheck test
 
