@@ -1,3 +1,5 @@
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 .PHONY: all header test clean
 
 
@@ -11,4 +13,4 @@ clean: header
 	$(MAKE) -s -C parse clean
 
 header: 
-	@echo "------------------" $(CURRENT_PATH) "------------------"
+	@echo "------------------" $(CURRENT_PATH)

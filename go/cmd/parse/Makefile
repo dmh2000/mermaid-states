@@ -1,7 +1,5 @@
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
-# MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-# CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 .PHONY: all header staticcheck test
 
 all: header staticcheck test
@@ -22,6 +20,6 @@ clean: header
 
 
 header:
-	@echo "------------------" $(shell basename $(PWD)) "------------------"
+	@echo "------------------" $(CURRENT_PATH)
 
 

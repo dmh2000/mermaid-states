@@ -1,3 +1,5 @@
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_PATH := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 
 
 .PHONY: test clean
@@ -17,4 +19,4 @@ clean: header
 	go clean
 
 header:
-	@echo "------------------" $(shell basename $(PWD)) "------------------"
+	@echo "------------------" $(CURRENT_PATH)
