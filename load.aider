@@ -1,6 +1,4 @@
 /drop
-/add       go
-/add       python
-/add       test
+/add       go/pkg
 /add       grammar.bnf
 
